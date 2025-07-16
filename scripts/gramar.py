@@ -2,10 +2,13 @@ import csv
 import re
 import ollama
 from multiprocessing import Pool, cpu_count
+from tqdm import tqdm
+
 
 OLLAMA_URL = 'http://localhost:11434/api/generate'
 MODEL_NAME = 'en2en:latest'
 SIZE_THRESHOLD = 1.5 # Se o texto corrigido for 1.5x maior, marcar como 'toCheck=yes'
+
 
 # Limpa o texto
 def clean_csv_text(text):
@@ -13,6 +16,7 @@ def clean_csv_text(text):
     text = re.sub(r'[\r\n]', ' ', text)
     text = re.sub(r'^The correct .* is:', '', text)
     return text
+
 
 # Corrige erros gramaticais em inglês
 def fix_grammar(text):
@@ -43,8 +47,13 @@ def process_row(row):
         'toCheck': to_check
     }
 
+
 # Processamento
 def process_grammar(input_path, output_path, debug=False, num_workers=None):
+
+    # Conta o número de linhas (exceto o cabeçalho)
+    with open(input_path, newline='', encoding='utf-8') as f:
+        total_lines = sum(1 for _ in f) - 1
 
     with open(input_path, newline='', encoding='utf-8') as infile:
         reader = csv.DictReader(infile)
@@ -55,8 +64,8 @@ def process_grammar(input_path, output_path, debug=False, num_workers=None):
                 fieldnames = ['Label', 'EmailText', 'toCheck']
                 writer = csv.DictWriter(outfile, fieldnames=fieldnames, delimiter='|')
                 writer.writeheader()
-                
-                for row in reader:
+
+                for row in tqdm(reader, total=total_lines, desc="Processando (debug)"):
                     processed_row = process_row(row)
                     writer.writerow(processed_row)
 
@@ -72,7 +81,9 @@ def process_grammar(input_path, output_path, debug=False, num_workers=None):
                 writer.writeheader()
 
                 with Pool(processes=num_workers) as pool:
-                    for processed_row in pool.imap_unordered(process_row, reader):
+                    # tqdm precisa de uma lista ou generator com tamanho conhecido
+                    processed_rows = pool.imap_unordered(process_row, reader)
+                    for processed_row in tqdm(processed_rows, total=total_lines, desc="Processando (multiprocessamento)"):
                         writer.writerow(processed_row)
 
     print(f'Arquivo salvo em: {output_path}')
