@@ -60,9 +60,7 @@ De acordo com a análise até o momento, temos um claro desbalanceamento nas cla
 
 A classe `ham` representa cerca de 87% dos dados. Um modelo treinado sem cuidado pode aprender a simplesmente prever tudo como `ham` e ainda parecer `preciso`.
     
-**Foi o que aconteceu no projeto do diabetes**, onde as classes estavam demasiadamente desbalanceadas. O Pedro, como bom estatístico, faz os dados falarem o que ele quer de forma convincente, só eu não fiquei convencido daqueles resultados: **Os modelos apresentados, tanto a versão MLP quanto a logística, NÃO FUNCIONAVAM!**
-    
-Tentei insistir para corrigir, mas fui voto vencido.
+**Foi o que aconteceu no [Projeto Diabetes](https://github.com/pcbrom/perceptron-mlp-cnn)**, onde as classes estavam demasiadamente desbalanceadas. Um integrante do grupo é estatístico, logo, tem a capacidade de fazer os dados falarem o que for conveniente... eu não fiquei convencido dos resultados. **Os modelos apresentados (tanto a versão [MLP](https://github.com/pcbrom/perceptron-mlp-cnn/blob/main/multilayer_perceptron.ipynb) quanto a [Regressão Logística](https://github.com/pcbrom/perceptron-mlp-cnn/blob/main/logistic_regression.ipynb)), ainda que apresentando excelentes métricas, NÃO PREVIAM CORRETAMENTE!**
 
 Como este projeto estou fazendo sozinho, não vou permitir desbalanceamentos. Para corrigir vou usar uma ou mais das possibilidades:
 
