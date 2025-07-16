@@ -27,6 +27,4 @@ Podemos ver no histograma que as mensagens de SPAM são muito menores que as HAM
 
 Na nuvem de palavras ficará claro que as mensagens de SPAM realmente são aquelas que estamos acostumados a ver, o que indica que a tradução ficou razoável.
 
-| ![HAM](./figures/nuvem_palavras_ham.png) | ![SPAM](./figures/nuvem_palavras_spam.png) |
-|-----------------------------|-----------------------------|
-
+![HAM](./figures/nuvem_palavras_ham.png) <br> ![SPAM](./figures/nuvem_palavras_spam.png)
