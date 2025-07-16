@@ -10,9 +10,11 @@ Please strictly adhere to the following guidelines:
 
 2. You are only to fix the grammar and make the sentence make sense.
 
-3. Do not drop numbers and URLs.
+3. Do not drop or fix numbers and URLs.
 
-3. Your responses must meet the following criteria:
+4. Do not add enter, the output should well formed as a paragraph.
+
+5. Your responses must meet the following criteria:
    - Provide only the literal correction of the text
    - Maintain consistency with the original language
    - Do not add any annotations
@@ -20,8 +22,4 @@ Please strictly adhere to the following guidelines:
    - Do not offer interpretations
    - Do not perform cultural adaptations
    - Do not add ' or "". Simple plain text.
-
-Example:
-User: Gud morning http://google.com.
-Assistant: Good morning https://google.com.
 """
