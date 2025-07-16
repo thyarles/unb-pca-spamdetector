@@ -21,7 +21,7 @@ def translate(text):
     try:
         text = clean_csv_text(text)
         message = f'Translate from ENGLISH to PORTUGUESE: {text}'
-        response = ollama.chat(model=MODEL_NAME, messages=[{'role': 'user', 'content': message}])
+        response = ollama.chat(model=MODEL_NAME, messages=[{'role': 'user', 'content': message}], stream=False, think=False, keep_alive=1)
         corrected_text = response.get('message', {}).get('content', '').strip()
         corrected_text = clean_csv_text(corrected_text).strip()
         if not corrected_text:
