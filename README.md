@@ -89,54 +89,54 @@ Como este projeto estou fazendo sozinho, não vou permitir desbalanceamentos. Pa
 
 Cada observação contém os seguintes atributos:
 
-1. **Label**, se a mensagem é ou não SPAM (ham/spam).
-1. **EmailText**, texto original da mensagem, em inglês (não usado).
-1. **EmailText**, texto traduzido da mensagem usado para classificação.
+1. `Label`, se a mensagem é ou não SPAM (ham/spam).
+1. `EmailText`, texto original da mensagem, em inglês (não usado).
+1. `EmailText`, texto traduzido da mensagem usado para classificação.
 
 ## Variáveis de saída (Target)
 
-1. **Outcome = 1**: SPAM
-2. **Outcome = 0**: HAM
+1. `0` = HAM
+2. `1` = SPAM
 
 ## Estrutura
 
 A estrutura da rede foi definida como:
 
 * Entrada: $1$ variáveis de entrada (tokenizada).
-* 1ª camada oculta: $5$ neurônios com ativação $\phi(z)$.
-* 2ª camada oculta: $3$ neurônios com ativação $\phi(z)$.
-* Camada de saída**: $2$ neurônios com ativação Softmax.
+* 1ª camada oculta: `5` neurônios com ativação $\phi(z)$.
+* 2ª camada oculta: `3` neurônios com ativação $\phi(z)$.
+* Camada de saída: `2` neurônios com ativação Softmax.
 
-### **Funções de Ativação**
+### Funções de Ativação
 
-#### ReLU
+1. ReLU
 
-Nas **camadas ocultas**, utilizamos a função Rectified Linear Unit (**ReLU**):
-$$
-\phi(z) = \max(0, z),
-$$
-computacionalmente eficiente e ajuda a evitar o problema de saturação presente em funções como a sigmoide.
+    Nas **camadas ocultas**, utilizamos a função Rectified Linear Unit (**ReLU**):
+    $$
+    \phi(z) = \max(0, z),
+    $$
+    computacionalmente eficiente e ajuda a evitar o problema de saturação presente em funções como a sigmoide.
 
-#### Softmax
-Na **camada de saída**, utilizamos a função **Softmax**:
-$$
-\text{softmax}(z_j) = \frac{e^{z_j}}{\sum_{k} e^{z_k}}
-$$
+1. Softmax
+    Na **camada de saída**, utilizamos a função **Softmax**:
+    $$
+    \text{softmax}(z_j) = \frac{e^{z_j}}{\sum_{k} e^{z_k}}
+    $$
 
-#### Custo
+1. Custo
 
-Como a saída está codificada em **one-hot**, adotamos a **cross-entropy categórica** como função de custo:
-$$
-\mathcal{L}(y, \hat{y}) = - \frac{1}{n} \sum_{i=1}^n \sum_{j=1}^{2} y_{ij} \log(\hat{y}_{ij})
-$$
+    Como a saída está codificada em **one-hot**, adotamos a **cross-entropy categórica** como função de custo:
+    $$
+    \mathcal{L}(y, \hat{y}) = - \frac{1}{n} \sum_{i=1}^n \sum_{j=1}^{2} y_{ij} \log(\hat{y}_{ij})
+    $$
 
-### Otimização
+1. Otimização
 
-O treinamento foi realizado utilizando o algoritmo de **descida do gradiente clássica (batch)**:
+    O treinamento foi realizado utilizando o algoritmo de **descida do gradiente clássica (batch)**:
 
-* Os gradientes foram computados por meio do algoritmo de **backpropagation**. Os pesos foram atualizados de forma simultânea com base no erro de todo o conjunto de treino, com taxa de aprendizado $\eta$.
+    * Os gradientes foram computados por meio do algoritmo de **backpropagation**. Os pesos foram atualizados de forma simultânea com base no erro de todo o conjunto de treino, com taxa de aprendizado $\eta$.
 
-### Separação
+### Separação dos dados
 
 Os dados foram separados da seguinte forma:
 
