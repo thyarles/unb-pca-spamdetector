@@ -93,7 +93,7 @@ Cada observação contém os seguintes atributos:
 1. `EmailText`, texto original da mensagem, em inglês (não usado).
 1. `EmailText`, texto traduzido da mensagem usado para classificação.
 
-##$ Variáveis de saída
+### Variáveis de saída
 
 1. `0` = HAM
 2. `1` = SPAM
