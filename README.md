@@ -81,9 +81,11 @@ Como este projeto estou fazendo sozinho, não vou permitir desbalanceamentos. Pa
 
 1. Uma outra atividade que podemos fazer é a produção de novos dados com base na correção gramatical do inglês e na tradução para o português, o que seria desejável.
 
-# Arquitetura
+## Arquitetura
 
-## Variáveis de entrada
+![Architecture](./figures/arquitetura.png)
+
+### Variáveis de entrada
 
 Cada observação contém os seguintes atributos:
 
@@ -105,9 +107,9 @@ A estrutura da rede foi definida como:
 * 2ª camada oculta: $3$ neurônios com ativação $\phi(z)$.
 * Camada de saída**: $2$ neurônios com ativação Softmax.
 
-## **Funções de Ativação**
+### **Funções de Ativação**
 
-### ReLU
+#### ReLU
 
 Nas **camadas ocultas**, utilizamos a função Rectified Linear Unit (**ReLU**):
 $$
@@ -115,26 +117,26 @@ $$
 $$
 computacionalmente eficiente e ajuda a evitar o problema de saturação presente em funções como a sigmoide.
 
-### Softmax
+#### Softmax
 Na **camada de saída**, utilizamos a função **Softmax**:
 $$
 \text{softmax}(z_j) = \frac{e^{z_j}}{\sum_{k} e^{z_k}}
 $$
 
-### Custo
+#### Custo
 
 Como a saída está codificada em **one-hot**, adotamos a **cross-entropy categórica** como função de custo:
 $$
 \mathcal{L}(y, \hat{y}) = - \frac{1}{n} \sum_{i=1}^n \sum_{j=1}^{2} y_{ij} \log(\hat{y}_{ij})
 $$
 
-## Otimização
+### Otimização
 
 O treinamento foi realizado utilizando o algoritmo de **descida do gradiente clássica (batch)**:
 
 * Os gradientes foram computados por meio do algoritmo de **backpropagation**. Os pesos foram atualizados de forma simultânea com base no erro de todo o conjunto de treino, com taxa de aprendizado $\eta$.
 
-## Separação
+### Separação
 
 Os dados foram separados da seguinte forma:
 
@@ -144,7 +146,7 @@ Os dados foram separados da seguinte forma:
 
 Para a validação e teste vamos observar o balanceamento das classes, sendo 5% de HAM/SPAM para cada.
 
-## Avaliação
+### Avaliação
 
 Durante o treinamento, monitorou-se:
 
