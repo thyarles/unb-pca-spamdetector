@@ -80,3 +80,75 @@ Como este projeto estou fazendo sozinho, não vou permitir desbalanceamentos. Pa
 1. Remover dados da classe `ham`, mas não vou seguir essa abordagem dado que a quantidade de dados já está baixa.
 
 1. Uma outra atividade que podemos fazer é a produção de novos dados com base na correção gramatical do inglês e na tradução para o português, o que seria desejável.
+
+# Arquitetura
+
+## Variáveis de entrada
+
+Cada observação contém os seguintes atributos:
+
+1. **Label**, se a mensagem é ou não SPAM (ham/spam).
+1. **EmailText**, texto original da mensagem, em inglês (não usado).
+1. **EmailText**, texto traduzido da mensagem usado para classificação.
+
+## Variáveis de saída (Target)
+
+1. **Outcome = 1**: SPAM
+2. **Outcome = 0**: HAM
+
+## Estrutura
+
+A estrutura da rede foi definida como:
+
+* Entrada: $1$ variáveis de entrada (tokenizada).
+* 1ª camada oculta: $5$ neurônios com ativação $\phi(z)$.
+* 2ª camada oculta: $3$ neurônios com ativação $\phi(z)$.
+* Camada de saída**: $2$ neurônios com ativação Softmax.
+
+## **Funções de Ativação**
+
+### ReLU
+
+Nas **camadas ocultas**, utilizamos a função Rectified Linear Unit (**ReLU**):
+$$
+\phi(z) = \max(0, z),
+$$
+computacionalmente eficiente e ajuda a evitar o problema de saturação presente em funções como a sigmoide.
+
+### Softmax
+Na **camada de saída**, utilizamos a função **Softmax**:
+$$
+\text{softmax}(z_j) = \frac{e^{z_j}}{\sum_{k} e^{z_k}}
+$$
+
+### Custo
+
+Como a saída está codificada em **one-hot**, adotamos a **cross-entropy categórica** como função de custo:
+$$
+\mathcal{L}(y, \hat{y}) = - \frac{1}{n} \sum_{i=1}^n \sum_{j=1}^{2} y_{ij} \log(\hat{y}_{ij})
+$$
+
+## Otimização
+
+O treinamento foi realizado utilizando o algoritmo de **descida do gradiente clássica (batch)**:
+
+* Os gradientes foram computados por meio do algoritmo de **backpropagation**. Os pesos foram atualizados de forma simultânea com base no erro de todo o conjunto de treino, com taxa de aprendizado $\eta$.
+
+## Separação
+
+Os dados foram separados da seguinte forma:
+
+* Treino = 80%
+* Validação = 10%
+* Teste = 10%
+
+Para a validação e teste vamos observar o balanceamento das classes, sendo 5% de HAM/SPAM para cada.
+
+## Avaliação
+
+Durante o treinamento, monitorou-se:
+
+* A **função de perda** (cross-entropy) em treino e validação.
+* A **acurácia** em ambos os conjuntos.
+
+Após o treinamento, o modelo foi avaliado no **conjunto de teste** por meio de matriz de confusão apresentando métricas de acurácia, precisão, recall e $F_1$-score.
