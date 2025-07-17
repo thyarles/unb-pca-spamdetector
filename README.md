@@ -102,10 +102,10 @@ Cada observação contém os seguintes atributos:
 
 A estrutura da rede foi definida como:
 
-* Entrada: `1` variáveis de entrada (tokenizada).
-* 1ª camada oculta: `5` neurônios com ativação $\phi(z)$.
-* 2ª camada oculta: `3` neurônios com ativação $\phi(z)$.
-* Camada de saída: `2` neurônios com ativação Softmax.
+* `1` variável de entrada (`Label` tokenizada).
+* `5` neurônios com ativação $\phi(z)$ na primeira camada oculta.
+* `3` neurônios com ativação $\phi(z)$ na segunda camada oculta.
+* `2` dois neurônios com ativação Softmax para a saída (`0` ou `1`).
 
 ### Funções de Ativação
 
@@ -136,8 +136,8 @@ A estrutura da rede foi definida como:
 Os dados foram separados da seguinte forma:
 
 * `80%` para treino (balanceadas por `class_weight`)
-* `10%` para validação (balanceadas entre HAM/SPAM)
-* `10%` para teste (balanceadas entre HAM/SPAM)
+* `10%` para validação (balanceadas entre `HAM`/`SPAM`)
+* `10%` para teste (balanceadas entre `HAM`/`SPAM`)
 
 ### Avaliação
 
