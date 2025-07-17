@@ -102,14 +102,14 @@ Cada observação contém os seguintes atributos:
 
 A estrutura da rede foi definida como:
 
-* Entrada: $1$ variáveis de entrada (tokenizada).
+* Entrada: `1` variáveis de entrada (tokenizada).
 * 1ª camada oculta: `5` neurônios com ativação $\phi(z)$.
 * 2ª camada oculta: `3` neurônios com ativação $\phi(z)$.
 * Camada de saída: `2` neurônios com ativação Softmax.
 
 ### Funções de Ativação
 
-1. ReLU
+1. **ReLU**
 
     Nas **camadas ocultas**, utilizamos a função Rectified Linear Unit (**ReLU**):
     $$
@@ -117,20 +117,21 @@ A estrutura da rede foi definida como:
     $$
     computacionalmente eficiente e ajuda a evitar o problema de saturação presente em funções como a sigmoide.
 
-1. Softmax
+1. **Softmax**
+
     Na **camada de saída**, utilizamos a função **Softmax**:
     $$
     \text{softmax}(z_j) = \frac{e^{z_j}}{\sum_{k} e^{z_k}}
     $$
 
-1. Custo
+1. **Custo**
 
     Como a saída está codificada em **one-hot**, adotamos a **cross-entropy categórica** como função de custo:
     $$
     \mathcal{L}(y, \hat{y}) = - \frac{1}{n} \sum_{i=1}^n \sum_{j=1}^{2} y_{ij} \log(\hat{y}_{ij})
     $$
 
-1. Otimização
+1. **Otimização**
 
     O treinamento foi realizado utilizando o algoritmo de **descida do gradiente clássica (batch)**:
 
