@@ -111,47 +111,34 @@ A estrutura da rede foi definida como:
 
 1. **ReLU**
 
-    Nas **camadas ocultas**, utilizamos a função Rectified Linear Unit (**ReLU**):
-    $$
-    \phi(z) = \max(0, z),
-    $$
-    computacionalmente eficiente e ajuda a evitar o problema de saturação presente em funções como a sigmoide.
+    Nas **camadas ocultas**, utilizamos a função Rectified Linear Unit (**ReLU**), que é computacionalmente eficiente e ajuda a evitar o problema de saturação presente em funções como a sigmoide:
+   
+    $\phi(z) = \max(0, z)$
 
 1. **Softmax**
 
     Na **camada de saída**, utilizamos a função **Softmax**:
-    $$
-    \text{softmax}(z_j) = \frac{e^{z_j}}{\sum_{k} e^{z_k}}
-    $$
+
+    $\text{softmax}(z_j) = \frac{e^{z_j}}{\sum_{k} e^{z_k}}$
 
 1. **Custo**
 
     Como a saída está codificada em **one-hot**, adotamos a **cross-entropy categórica** como função de custo:
-    $$
-    \mathcal{L}(y, \hat{y}) = - \frac{1}{n} \sum_{i=1}^n \sum_{j=1}^{2} y_{ij} \log(\hat{y}_{ij})
-    $$
+   
+    $\mathcal{L}(y, \hat{y}) = - \frac{1}{n} \sum_{i=1}^n \sum_{j=1}^{2} y_{ij} \log(\hat{y}_{ij})$
 
 1. **Otimização**
 
-    O treinamento foi realizado utilizando o algoritmo de **descida do gradiente clássica (batch)**:
-
-    * Os gradientes foram computados por meio do algoritmo de **backpropagation**. Os pesos foram atualizados de forma simultânea com base no erro de todo o conjunto de treino, com taxa de aprendizado $\eta$.
+    O treinamento foi realizado utilizando o algoritmo de **descida do gradiente clássica (batch)**. Os gradientes foram computados por meio do algoritmo de **backpropagation**. Os pesos foram atualizados de forma simultânea com base no erro de todo o conjunto de treino, com taxa de aprendizado $\eta$.
 
 ### Separação dos dados
 
 Os dados foram separados da seguinte forma:
 
-* Treino = 80%
-* Validação = 10%
-* Teste = 10%
-
-Para a validação e teste vamos observar o balanceamento das classes, sendo 5% de HAM/SPAM para cada.
+* `80%` para treino (balanceadas por `class_weight`)
+* `10%` para validação (balanceadas entre HAM/SPAM)
+* `10%` para teste (balanceadas entre HAM/SPAM)
 
 ### Avaliação
 
-Durante o treinamento, monitorou-se:
-
-* A **função de perda** (cross-entropy) em treino e validação.
-* A **acurácia** em ambos os conjuntos.
-
-Após o treinamento, o modelo foi avaliado no **conjunto de teste** por meio de matriz de confusão apresentando métricas de acurácia, precisão, recall e $F_1$-score.
+Durante o treinamento, monitorou-se a **função de perda** (cross-entropy) em treino e validação e a **acurácia**. Após o treinamento, o modelo foi avaliado no **conjunto de teste** por meio de matriz de confusão e métricas de acurácia, precisão, recall e $F_1$-score.
