@@ -68,9 +68,9 @@ De acordo com a análise até o momento, temos um claro desbalanceamento nas cla
 
 A classe `ham` representa cerca de 87% dos dados. Um modelo treinado sem cuidado pode aprender a simplesmente prever tudo como `ham` e ainda parecer `preciso`.
     
-**Foi o que aconteceu no [Projeto Diabetes](https://github.com/pcbrom/perceptron-mlp-cnn)**, onde as classes estavam demasiadamente desbalanceadas. Um integrante do grupo é estatístico, logo, tem a capacidade de fazer os dados falarem o que for conveniente... eu não fiquei convencido dos resultados. **Os modelos apresentados (tanto a versão [MLP](https://github.com/pcbrom/perceptron-mlp-cnn/blob/main/multilayer_perceptron.ipynb) quanto a [Regressão Logística](https://github.com/pcbrom/perceptron-mlp-cnn/blob/main/logistic_regression.ipynb)), ainda que apresentando excelentes métricas, NÃO PREVIAM CORRETAMENTE!**
+<span style="color: red;">**Foi o que aconteceu no [Projeto Diabetes](https://github.com/pcbrom/perceptron-mlp-cnn)**, onde as classes estavam demasiadamente desbalanceadas. Um integrante do grupo é estatístico, logo, tem a capacidade de fazer os dados falarem o que for conveniente... eu não fiquei convencido dos resultados. **Os modelos apresentados (tanto a versão [MLP](https://github.com/pcbrom/perceptron-mlp-cnn/blob/main/multilayer_perceptron.ipynb) quanto a [Regressão Logística](https://github.com/pcbrom/perceptron-mlp-cnn/blob/main/logistic_regression.ipynb)), ainda que apresentando excelentes métricas, NÃO PREVIAM CORRETAMENTE!** Como este projeto estou fazendo sozinho, não vou permitir desbalanceamentos.</span>
 
-Como este projeto estou fazendo sozinho, não vou permitir desbalanceamentos. Para corrigir vou usar uma ou mais das possibilidades:
+Para corrigir vou usar uma ou mais das possibilidades:
 
 1. Na hora de chamar o treinador MLP, dar peso maior para a classe 'desbalanceada':
     ```
@@ -98,7 +98,7 @@ O modelo foi construído com as seguintes camadas:
 2.  **Camada de GlobalAveragePooling1D**: Reduz a dimensionalidade dos dados para evitar *overfitting*.
 3.  **Camada Densa (Oculta)**: Com `128` neurônios e função de ativação ReLU.
 3.  **Camada Densa (Oculta)**: Com `64` neurônios e função de ativação ReLU.
-5.  **Camada de Saída**: Com `1` neurônio e função de ativação Sigmoid para produzir uma probabilidade entre 0 e 1.
+5.  **Camada de Saída**: Com `1` neurônio e função de ativação Sigmoid (probabilidade).
 
 ![Architecture](./figures/arquitetura.png)
 
@@ -138,19 +138,22 @@ A estrutura da rede foi definida como:
 1.  **ReLU (Rectified Linear Unit)**:
 
     Nas camadas ocultas, utilizamos a função ReLU, que é computacionalmente eficiente e ajuda a mitigar o problema do desaparecimento do gradiente.
+    
     $\\phi(z) = \\max(0, z)$
 
-2.  **Sigmoid**:
+3.  **Sigmoid**:
 
     Na camada de saída, a função Sigmoid mapeia a saída para um valor de probabilidade entre 0 (HAM) e 1 (SPAM).
+    
     $\\sigma(z) = \\frac{1}{1 + e^{-z}}$
 
-3.  **Função de Custo (Loss)**:
+5.  **Função de Custo (Loss)**:
 
     Utilizamos a **entropia cruzada binária (binary cross-entropy)**, adequada para problemas de classificação binária.
+    
     $\\mathcal{L}(y, \\hat{y}) = -[y \\log(\\hat{y}) + (1 - y) \\log(1 - \\hat{y})]$
 
-4.  **Otimizador**:
+7.  **Otimizador**:
 
     O treinamento foi realizado com o otimizador **Adam**, uma escolha popular e eficiente para a maioria dos problemas de deep learning.
 
