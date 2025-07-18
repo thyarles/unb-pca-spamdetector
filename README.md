@@ -2,38 +2,46 @@
 
 ## Objetivo do projeto
 
-Este projeto tem o objetivo de mostrar como o **Multilayer Perceptron** pode ser utilizado para a detecção de SPAM. Embora o projeto esteja em Língua Portuguesa do Brasil, a base de SMS utilizada foi [encontrada no Kaggle](https://www.kaggle.com/code/dhgupta/bag-of-words-model/input), em Língua Inglesa, com o original disponibilizado em `data/spam.csv`.
+Este projeto tem o objetivo de mostrar como o **Multilayer Perceptron (MLP)** pode ser utilizado para a detecção de SPAM. Embora o projeto esteja em Língua Portuguesa do Brasil, a base de SMS utilizada foi [encontrada no Kaggle](https://www.kaggle.com/code/dhgupta/bag-of-words-model/input), em Língua Inglesa, com o original disponibilizado em `data/spam.csv`.
 
 Muitos projetos para a avaliação de SPAM em Língua Inglesa existem, assim deseja-se que este projeto faça tal classificação em Língua Portuguesa sendo necessário, para tanto, a tradução de toda a base de dados que será feita da seguinte forma:
 
-1. Utilização de *small language models* no [Ollama](https://ollama.com) para rodar *small language models* local;
-1. Utilização do modelo [Quen2.5 Translator](https://ollama.com/lauchacarro/qwen2.5-translator) para a tradução do texto para a língua portuguesa, com revisão humana superficial (arquivo gerado em `data/spam_br.csv`).
+1.  Utilização de *small language models* no [Ollama](https://ollama.com) para rodar *small language models* local;
+2.  Utilização do modelo [Quen2.5 Translator](https://ollama.com/lauchacarro/qwen2.5-translator) para a tradução do texto para a língua portuguesa, com revisão humana superficial (arquivo gerado em `data/spam_br.csv`).
 
-## Tradução da base de dados em para português
+## Análise Exploratória dos Dados
+
+O primeiro passo em um projeto dessa natureza é analisar os dados. Após traduzir e carregar a base, realizamos uma análise para entender a estrutura e as características das mensagens classificadas como `HAM` (não-spam) e `SPAM`.
+
+# Tradução da base de dados em para português
 
 Nesta parte vamos gerar o arquivo `data/spam_en.csv` que será o resultado da correção gramatical aplicada no arquivo original `data/spam.csv`.
 
-## Análise dos dados
+### Histograma do Comprimento das Mensagens
 
-O primeiro passo em um projeto dessa natureza é analisar os dados. Para tanto, faremos uma leitura da base original e vamos contar o número palavras e frases. Ao final dessa tarefa, vamos decidir por executar ou não algum pré-processamento.
-
-### Histograma
-
-Podemos ver no histograma que as mensagens de SPAM são muito menores que as HAM na distribuição.
+Analisamos a distribuição do comprimento das mensagens para cada categoria. O histograma abaixo revela uma tendência clara: mensagens de SPAM tendem a ser significativamente mais longas do que as mensagens comuns (HAM). Isso provavelmente se deve à necessidade de incluir informações promocionais, links e instruções detalhadas.
 
 ![Histogram](./figures/histograma.png)
 
 ### Nuvem de palavras
 
-Na nuvem de palavras ficará claro que as mensagens de SPAM realmente são aquelas que estamos acostumados a ver, o que indica que a tradução ficou razoável.
+Para visualizar as palavras mais frequentes em cada categoria, geramos duas nuvens de palavras.
+
+#### Nuvem de Palavras - HAM
+
+As mensagens legítimas (`HAM`) são dominadas por palavras comuns do dia a dia, pronomes e saudações, como "eu", "você", "ele", "agora", "bem", "casa" e "amor".
 
 ![HAM](./figures/nuvem_palavras_ham.png)
 
+#### Nuvem de Palavras - SPAM
+
+Em contraste, a nuvem de SPAM destaca termos de urgência e apelo comercial, como "grátis", "prêmio", "ligue", "agora", "texto", "ganhou" e "urgente". Essa diferença lexical é a principal característica que o nosso modelo irá aprender a identificar.
+
 ![SPAM](./figures/nuvem_palavras_spam.png)
 
-### Análise de frequência das palavras
+### Top 25 Palavras Mais Comuns
 
-Por fim, procedeu-se com uma análise das 25 palavras mais frequentes em cada tipo de mensagem.
+O gráfico de barras abaixo mostra as 25 palavras mais frequentes em todo o conjunto de dados (removendo *stopwords* e símbolos). A alta frequência de pronomes e artigos é esperada em qualquer corpo de texto em português.
 
 ![Frequency](./figures/top_25_palavras.png)
 
@@ -81,64 +89,151 @@ Como este projeto estou fazendo sozinho, não vou permitir desbalanceamentos. Pa
 
 1. Uma outra atividade que podemos fazer é a produção de novos dados com base na correção gramatical do inglês e na tradução para o português, o que seria desejável.
 
-## Arquitetura
+
+### Arquitetura do Modelo
+
+O modelo foi construído com as seguintes camadas:
+
+1.  **Camada de Embedding**: Transforma os índices de palavras em vetores densos de tamanho fixo.
+2.  **Camada de GlobalAveragePooling1D**: Reduz a dimensionalidade dos dados para evitar *overfitting*.
+3.  **Camada Densa (Oculta)**: Com `128` neurônios e função de ativação ReLU.
+3.  **Camada Densa (Oculta)**: Com `64` neurônios e função de ativação ReLU.
+5.  **Camada de Saída**: Com `1` neurônio e função de ativação Sigmoid para produzir uma probabilidade entre 0 e 1.
 
 ![Architecture](./figures/arquitetura.png)
 
-### Variáveis de entrada
+| **Layer (type)**                      | **Output Shape**                              | **Param #**   |
+|---------------------------------------|----------------------------------------------|---------------|
+| embedding_1 (Embedding)               | (None, 200, 100)                             | 818,500       |
+| global_average_pooling1d (GlobalAveragePooling1D) | (None, 100)                               | 0             |
+| dense_3 (Dense)                      | (None, 128)                                  | 12,928        |
+| dense_4 (Dense)                      | (None, 64)                                   | 8,256         |
+| dense_5 (Dense)                      | (None, 1)                                    | 65            |
+
+#### Variáveis de entrada
 
 Cada observação contém os seguintes atributos:
 
 1. `Label`, se a mensagem é ou não SPAM (ham/spam).
 1. `EmailText`, texto original da mensagem, em inglês (não usado).
-1. `EmailText`, texto traduzido da mensagem usado para classificação.
+1. `EmailTextBR`, texto traduzido da mensagem usado para classificação.
 
-### Variáveis de saída
+#### Variáveis de classificação
 
 1. `0` = HAM
 2. `1` = SPAM
 
-### Estrutura
+#### Estrutura
 
 A estrutura da rede foi definida como:
 
-* `1` variável de entrada (`Label` tokenizada).
-* `5` neurônios com ativação $\phi(z)$ na primeira camada oculta.
-* `3` neurônios com ativação $\phi(z)$ na segunda camada oculta.
-* `2` dois neurônios com ativação Softmax para a saída (`0` ou `1`).
+* `100` tokens de entrada (`Label` tokenizada).
+* `---` `GlobalAveragePooling1D` para transformar entrada em tamanho fixo
+* `128` neurônios com ativação $\phi(z)$ na primeira camada oculta.
+* `064` neurônios com ativação $\phi(z)$ na segunda camada oculta.
+* `001` um neurônios com ativação Sigmoid para a saída (probabilidade).
 
-### Funções de Ativação
+#### Funções de Ativação e Otimização
 
-1. **ReLU**
+1.  **ReLU (Rectified Linear Unit)**:
 
-    Nas **camadas ocultas**, utilizamos a função Rectified Linear Unit (**ReLU**), que é computacionalmente eficiente e ajuda a evitar o problema de saturação presente em funções como a sigmoide:
-   
-    $\phi(z) = \max(0, z)$
+    Nas camadas ocultas, utilizamos a função ReLU, que é computacionalmente eficiente e ajuda a mitigar o problema do desaparecimento do gradiente.
+    $\\phi(z) = \\max(0, z)$
 
-1. **Softmax**
+2.  **Sigmoid**:
 
-    Na **camada de saída**, utilizamos a função **Softmax**:
+    Na camada de saída, a função Sigmoid mapeia a saída para um valor de probabilidade entre 0 (HAM) e 1 (SPAM).
+    $\\sigma(z) = \\frac{1}{1 + e^{-z}}$
 
-    $\text{softmax}(z_j) = \frac{e^{z_j}}{\sum_{k} e^{z_k}}$
+3.  **Função de Custo (Loss)**:
 
-1. **Custo**
+    Utilizamos a **entropia cruzada binária (binary cross-entropy)**, adequada para problemas de classificação binária.
+    $\\mathcal{L}(y, \\hat{y}) = -[y \\log(\\hat{y}) + (1 - y) \\log(1 - \\hat{y})]$
 
-    Como a saída está codificada em **one-hot**, adotamos a **cross-entropy categórica** como função de custo:
-   
-    $\mathcal{L}(y, \hat{y}) = - \frac{1}{n} \sum_{i=1}^n \sum_{j=1}^{2} y_{ij} \log(\hat{y}_{ij})$
+4.  **Otimizador**:
 
-1. **Otimização**
-
-    O treinamento foi realizado utilizando o algoritmo de **descida do gradiente clássica (batch)**. Os gradientes foram computados por meio do algoritmo de **backpropagation**. Os pesos foram atualizados de forma simultânea com base no erro de todo o conjunto de treino, com taxa de aprendizado $\eta$.
+    O treinamento foi realizado com o otimizador **Adam**, uma escolha popular e eficiente para a maioria dos problemas de deep learning.
 
 ### Separação dos dados
 
 Os dados foram separados da seguinte forma:
 
-* `80%` para treino (balanceadas por `class_weight`)
-* `10%` para validação (balanceadas entre `HAM`/`SPAM`)
-* `10%` para teste (balanceadas entre `HAM`/`SPAM`)
+* `70%` para treino (balanceadas por `class_weight`)
+* `15%` para validação (balanceadas entre `HAM`/`SPAM`)
+* `15%` para teste (balanceadas entre `HAM`/`SPAM`)
 
-### Avaliação
+## Treinamento e Avaliação
 
-Durante o treinamento, monitorou-se a **função de perda** (cross-entropy) em treino e validação e a **acurácia**. Após o treinamento, o modelo foi avaliado no **conjunto de teste** por meio de matriz de confusão e métricas de acurácia, precisão, recall e $F_1$-score.
+### Curvas de Aprendizagem
+
+O modelo foi treinado com 20 épocas com `EarlyStopping = 3` (se o modelo começar a regredir por três vezes consecutivas, para e pegar o melhor treinamento). Assim, o modelo executou apenas 12 das 20 épocas planejadas, salvando tempo e processamento.
+
+Os gráficos de acurácia e perda (loss) ao longo do treinamento mostram que o modelo convergiu de maneira estável. A proximidade entre as curvas de treino e validação indica que não houve *overfitting* significativo.
+
+### Matriz de Confusão e Métricas de Performance
+
+A performance do modelo no conjunto de teste foi avaliada utilizando a matriz de confusão e métricas clássicas.
+
+![Confusion](./figures/matriz_confusao.png)
+
+A partir da matriz, observamos:
+
+  * **Verdadeiros Negativos (HAM correto)**: 489
+  * **Falsos Positivos (HAM incorreto)**: 6
+  * **Falsos Negativos (SPAM incorreto)**: 10
+  * **Verdadeiros Positivos (SPAM correto)**: 53
+
+
+As métricas de performance alcançadas no conjunto de teste foram:
+
+  * **Acurácia**: 98.92%
+  * **Precisão**: 89.83%
+  * **Recall (Sensibilidade)**: 84.13%
+  * **F1-Score**: 86.89%
+
+![Metrics](./figures/treinamento.png)
+
+A alta acurácia e o bom F1-Score indicam que o modelo é robusto e eficaz na distinção entre SPAM e HAM.
+
+## Teste com Dados Reais
+
+Para validar o modelo em um cenário prático, testamos com novas frases que ele nunca viu antes. Os resultados abaixo demonstram a sua capacidade de generalização.
+
+* `SPAM` Ganhe um prêmio de R$10.000! Clique aqui para reivindicar agora!
+
+* `SPAM` Oferta exclusiva: 50% de desconto em todos os produtos. Não perca!
+
+* `_HAM` Oi, mãe! Chego para o jantar às 19h.
+
+* `_HAM` Reunião de equipe amanhã às 10h. Por favor, confirme sua presença.
+
+* `SPAM` Seu iPhone 15 foi selecionado! Responda a esta pesquisa para recebê-lo grátis agora!
+
+* `SPAM` Você ganhou 1000 reais. Clique nesse link para receber.
+
+* `_HAM` Eu amo programar, é muito divertido!
+
+* `SPAM` Sua conta foi comprometida, ligue para 555-1234 para redefinir sua senha imediatamente.
+
+O modelo classificou corretamente todas as mensagens, atribuindo probabilidades muito altas para a classe correta, o que demonstra sua confiança e eficácia.
+
+***OBS: Adicinou-se um `_` em `HAM` só para alinhar a leitura, ele não existe no modelo.***
+
+## Conclusão
+
+Este projeto demonstrou com sucesso a aplicação de um modelo de Multilayer Perceptron para a detecção de SPAM em mensagens SMS em português. A partir de uma base de dados originalmente em inglês, realizamos a tradução e um completo ciclo de análise, treinamento e validação.
+
+A análise exploratória foi fundamental para identificar padrões, como o maior comprimento e o vocabulário específico de mensagens de SPAM. O modelo de rede neural aprendeu esses padrões eficientemente, alcançando uma acurácia de **98.92%** no conjunto de teste e mostrando excelente performance em exemplos do mundo real.
+
+Os resultados confirmam que, mesmo com uma arquitetura de rede neural relativamente simples, é possível criar um detector de SPAM altamente eficaz, destacando a importância da qualidade dos dados e do pré-processamento adequado.
+
+## Ferramentas e Tecnologias
+
+  * **Linguagem**: [Python](https://www.python.org/)
+  * **Análise e Manipulação de Dados**: [Pandas](https://pandas.pydata.org/), [NumPy](https://numpy.org/)
+  * **Deep Learning**: [TensorFlow](https://www.tensorflow.org/) / [Keras](https://keras.io/)
+  * **Machine Learning (auxiliar)**: [Scikit-learn](https://scikit-learn.org/stable/)
+  * **Visualização de Dados**: [Matplotlib](https://matplotlib.org/), [Seaborn](https://seaborn.pydata.org/)
+  * **Processamento de Linguagem Natural**: [NLTK](https://www.nltk.org/), [WordCloud](https://github.com/amueller/word_cloud)
+  * **Tradução**: [Ollama](https://ollama.com/) com o modelo [qwen2.5-translator](https://ollama.com/lauchacarro/qwen2.5-translator)
+  * **Dataset**: [SMS Spam Collection Dataset no Kaggle](https://www.kaggle.com/datasets/uciml/sms-spam-collection-dataset)
