@@ -167,11 +167,51 @@ Os dados foram separados da seguinte forma:
 
 ## Treinamento e Avaliação
 
+O modelo foi treinado com 20 épocas com `EarlyStopping = 3` (se o modelo começar a regredir por três vezes consecutivas, para e pegar o melhor treinamento).
+
+## Resumo do Treinamento do Modelo MLP
+
+| Epoch | Accuracy | AUC    | Loss   | Precision | Recall  | Val Accuracy | Val AUC | Val Loss | Val Precision | Val Recall |
+|-------|----------|--------|--------|-----------|---------|--------------|---------|----------|---------------|------------|
+| 1     | 0.8212   | 0.7207 | 0.6640 | 0.2180    | 0.2207  | 0.9629       | 0.9701  | 0.4925   | 0.9655        | 0.7500     |
+| 2     | 0.7684   | 0.7914 | 0.5678 | 0.3366    | 0.6454  | 0.9653       | 0.9734  | 0.2268   | 0.9192        | 0.8125     |
+| 3     | 0.9087   | 0.9471 | 0.3160 | 0.6314    | 0.8847  | 0.9653       | 0.9767  | 0.1066   | 0.9368        | 0.7946     |
+| 4     | 0.9605   | 0.9748 | 0.1647 | 0.8130    | 0.9139  | 0.9701       | 0.9790  | 0.1007   | 0.9223        | 0.8482     |
+| 5     | 0.9425   | 0.9804 | 0.1704 | 0.7166    | 0.9209  | 0.9438       | 0.9812  | 0.1850   | 0.7241        | 0.9375     |
+| 6     | 0.9537   | 0.9773 | 0.1733 | 0.7714    | 0.9256  | 0.9737       | 0.9815  | 0.0913   | 0.9167        | 0.8839     |
+| 7     | 0.9622   | 0.9826 | 0.1531 | 0.8311    | 0.9295  | 0.9701       | 0.9818  | 0.0963   | 0.9888        | 0.7857     |
+| 8     | 0.9745   | 0.9900 | 0.1091 | 0.8764    | 0.9567  | 0.9641       | 0.9834  | 0.1203   | 0.8254        | 0.9286     |
+| 9     | 0.9791   | 0.9934 | 0.0907 | 0.9039    | 0.9505  | 0.9797       | 0.9847  | 0.0757   | 0.9524        | 0.8929     |
+| 10    | 0.9682   | 0.9894 | 0.1157 | 0.8516    | 0.9478  | 0.9330       | 0.9843  | 0.1776   | 0.6818        | 0.9375     |
+| 11    | 0.9734   | 0.9895 | 0.1088 | 0.8637    | 0.9516  | 0.9713       | 0.9726  | 0.0961   | 0.9889        | 0.7946     |
+| 12    | 0.9794   | 0.9873 | 0.1228 | 0.9080    | 0.9466  | 0.9211       | 0.9846  | 0.2097   | 0.6369        | 0.9554     |
+
+**Modelo salvo em:** `model/spam.keras`
+
+Assim, o modelo executou apenas 12 das 20 épocas planejadas, salvando tempo e processamento. As métricas finais do treinamento são apresentadas a seguir.
+
+| Métrica          | Valor                |
+|------------------|----------------------|
+| Test Loss        | 0.0731               |
+| Test Accuracy    | 0.9773               |
+| Test AUC         | 0.9870               |
+| Test Precision   | 0.9604               |
+| Test Recall      | 0.8661               |
+
+
 ### Curvas de Aprendizagem
 
-O modelo foi treinado com 20 épocas com `EarlyStopping = 3` (se o modelo começar a regredir por três vezes consecutivas, para e pegar o melhor treinamento). Assim, o modelo executou apenas 12 das 20 épocas planejadas, salvando tempo e processamento.
+#### Durante o treinamento
 
 Os gráficos de acurácia e perda (loss) ao longo do treinamento mostram que o modelo convergiu de maneira estável. A proximidade entre as curvas de treino e validação indica que não houve *overfitting* significativo.
+
+![Confusion](./figures/treinamento.png)
+
+#### No conjunto de testes
+
+![roc](./figures/curva_roc.png)
+
+![recall](./figures/curva_precisao_recal.png)
 
 ### Matriz de Confusão e Métricas de Performance
 
@@ -181,20 +221,22 @@ A performance do modelo no conjunto de teste foi avaliada utilizando a matriz de
 
 A partir da matriz, observamos:
 
-  * **Verdadeiros Negativos (HAM correto)**: 489
-  * **Falsos Positivos (HAM incorreto)**: 6
-  * **Falsos Negativos (SPAM incorreto)**: 10
-  * **Verdadeiros Positivos (SPAM correto)**: 53
+* `720` Verdadeiros negativos (HAM corretamente identificado)
+* `004` Falsos positivos (HAM incorretamente classificado como SPAM)
+* `015` Falsos negativos (SPAM incorretamente classificado como HAM)
+* `097` Verdadeiros positivos (SPAM corretamente identificado)
 
 
 As métricas de performance alcançadas no conjunto de teste foram:
 
-  * **Acurácia**: 98.92%
-  * **Precisão**: 89.83%
-  * **Recall (Sensibilidade)**: 84.13%
-  * **F1-Score**: 86.89%
+| Classe  | Precision | Recall | F1-Score | Support |
+|---------|-----------|--------|----------|---------|
+| 0       | 0.98      | 0.99   | 0.99     | 724     |
+| 1       | 0.96      | 0.87   | 0.91     | 112     |
+| **Accuracy**    |           |        | 0.98     | 836     |
+| **Macro avg**   | 0.97      | 0.93   | 0.95     | 836     |
+| **Weighted avg**| 0.98      | 0.98   | 0.98     | 836     |
 
-![Metrics](./figures/treinamento.png)
 
 A alta acurácia e o bom F1-Score indicam que o modelo é robusto e eficaz na distinção entre SPAM e HAM.
 
@@ -203,19 +245,12 @@ A alta acurácia e o bom F1-Score indicam que o modelo é robusto e eficaz na di
 Para validar o modelo em um cenário prático, testamos com novas frases que ele nunca viu antes. Os resultados abaixo demonstram a sua capacidade de generalização.
 
 * `SPAM` Ganhe um prêmio de R$10.000! Clique aqui para reivindicar agora!
-
 * `SPAM` Oferta exclusiva: 50% de desconto em todos os produtos. Não perca!
-
 * `_HAM` Oi, mãe! Chego para o jantar às 19h.
-
 * `_HAM` Reunião de equipe amanhã às 10h. Por favor, confirme sua presença.
-
 * `SPAM` Seu iPhone 15 foi selecionado! Responda a esta pesquisa para recebê-lo grátis agora!
-
 * `SPAM` Você ganhou 1000 reais. Clique nesse link para receber.
-
 * `_HAM` Eu amo programar, é muito divertido!
-
 * `SPAM` Sua conta foi comprometida, ligue para 555-1234 para redefinir sua senha imediatamente.
 
 O modelo classificou corretamente todas as mensagens, atribuindo probabilidades muito altas para a classe correta, o que demonstra sua confiança e eficácia.
