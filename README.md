@@ -213,7 +213,7 @@ Os gráficos de acurácia e perda (loss) ao longo do treinamento mostram que o m
 
 ![recall](./figures/curva_precisao_recal.png)
 
-### Matriz de Confusão e Métricas de Performance
+### Matriz de Confusão
 
 A performance do modelo no conjunto de teste foi avaliada utilizando a matriz de confusão e métricas clássicas.
 
@@ -226,6 +226,7 @@ A partir da matriz, observamos:
 * `015` Falsos negativos (SPAM incorretamente classificado como HAM)
 * `097` Verdadeiros positivos (SPAM corretamente identificado)
 
+### Métricas de performance
 
 As métricas de performance alcançadas no conjunto de teste foram:
 
@@ -236,7 +237,6 @@ As métricas de performance alcançadas no conjunto de teste foram:
 | **Accuracy**    |           |        | 0.98     | 836     |
 | **Macro avg**   | 0.97      | 0.93   | 0.95     | 836     |
 | **Weighted avg**| 0.98      | 0.98   | 0.98     | 836     |
-
 
 A alta acurácia e o bom F1-Score indicam que o modelo é robusto e eficaz na distinção entre SPAM e HAM.
 
