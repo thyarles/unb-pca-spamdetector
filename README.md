@@ -235,19 +235,30 @@ O modelo classificou todas as mensagens corretamente, atribuindo probabilidades 
 
 ## Conclusão
 
-Este projeto demonstrou com sucesso a aplicação de um modelo de Multilayer Perceptron para a detecção de SPAM em mensagens SMS em português. A partir de uma base de dados originalmente em inglês, realizamos a tradução e um completo ciclo de análise, treinamento e validação.
+Este projeto demonstrou com sucesso a aplicação de um modelo de **Multilayer Perceptron (MLP)** para a detecção de **SPAM** em mensagens SMS em português. A partir de um dataset originalmente em inglês, realizamos a tradução e completamos um ciclo completo de análise, treinamento e validação.
 
-A análise exploratória foi fundamental para identificar padrões, como o maior comprimento e o vocabulário específico de mensagens de SPAM. O modelo de rede neural aprendeu esses padrões eficientemente, alcançando uma acurácia de **98.92%** no conjunto de teste e mostrando excelente performance em exemplos do mundo real.
+A análise exploratória foi fundamental para identificar padrões específicos, como o maior comprimento e vocabulário peculiar de mensagens **SPAM**. O modelo de rede neural aprendeu esses padrões de forma eficiente, alcançando uma **acurácia de 97.73%** no conjunto de teste e exibindo excelente desempenho em exemplos do mundo real.
 
-Os resultados confirmam que, mesmo com uma arquitetura de rede neural relativamente simples, é possível criar um detector de SPAM altamente eficaz, destacando a importância da qualidade dos dados e do pré-processamento adequado.
+Os resultados confirmam que, mesmo com uma arquitetura de rede neural relativamente simples, é possível criar um detector de **SPAM** altamente eficaz. Isso ressalta a importância da qualidade dos dados e do pré-processamento adequado para garantir a performance do modelo.
 
 ## Ferramentas e Tecnologias
 
-  * **Linguagem**: [Python](https://www.python.org/)
-  * **Análise e Manipulação de Dados**: [Pandas](https://pandas.pydata.org/), [NumPy](https://numpy.org/)
-  * **Deep Learning**: [TensorFlow](https://www.tensorflow.org/) / [Keras](https://keras.io/)
-  * **Machine Learning (auxiliar)**: [Scikit-learn](https://scikit-learn.org/stable/)
-  * **Visualização de Dados**: [Matplotlib](https://matplotlib.org/), [Seaborn](https://seaborn.pydata.org/)
-  * **Processamento de Linguagem Natural**: [NLTK](https://www.nltk.org/), [WordCloud](https://github.com/amueller/word_cloud)
-  * **Tradução**: [Ollama](https://ollama.com/) com o modelo [qwen2.5-translator](https://ollama.com/lauchacarro/qwen2.5-translator)
-  * **Dataset**: [SMS Spam Collection Dataset no Kaggle](https://www.kaggle.com/datasets/uciml/sms-spam-collection-dataset)
+Este projeto foi desenvolvido utilizando as seguintes ferramentas e bibliotecas:
+
+- **Linguagem**: [Python](https://www.python.org/)
+- **Análise e Manipulação de Dados**: 
+  - [Pandas](https://pandas.pydata.org/)
+  - [NumPy](https://numpy.org/)
+- **Deep Learning**:
+  - [TensorFlow](https://www.tensorflow.org/)
+  - [Keras](https://keras.io/)
+- **Machine Learning (Auxiliar)**: [Scikit-learn](https://scikit-learn.org/stable/)
+- **Visualização de Dados**:
+  - [Matplotlib](https://matplotlib.org/)
+  - [Seaborn](https://seaborn.pydata.org/)
+- **Processamento de Linguagem Natural**:
+  - [NLTK](https://www.nltk.org/)
+  - [WordCloud](https://github.com/amueller/word_cloud)
+- **Tradução**: 
+  - [Ollama](https://ollama.com/) com o modelo [qwen2.5-translator](https://ollama.com/lauchacarro/qwen2.5-translator)
+- **Dataset**: [SMS Spam Collection Dataset no Kaggle](https://www.kaggle.com/datasets/uciml/sms-spam-collection-dataset)
