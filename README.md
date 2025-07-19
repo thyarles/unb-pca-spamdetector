@@ -9,41 +9,65 @@ Apesar de haver diversos projetos de detecção de SPAM em inglês, este projeto
 1. Utilização de *small language models* no [Ollama](https://ollama.com) para rodar modelos localmente.
 2. Aplicação do modelo [Qwen2.5 Translator](https://ollama.com/lauchacarro/qwen2.5-translator) para traduzir as mensagens para o português, com uma revisão humana superficial. O arquivo resultante será `data/spam_br.csv`.
 
-## Análise Exploratória dos Dados
+## 1. Análise Exploratória dos Dados
 
 O primeiro passo em qualquer projeto de Machine Learning é entender os dados. Após a tradução e carregamento da base, realizamos uma análise exploratória para compreender a estrutura e as características das mensagens classificadas como `HAM` (não-spam) e `SPAM`.
 
-### Histograma do Comprimento das Mensagens
+### 1.1. Histograma do Comprimento das Mensagens
 
-Analisamos o comprimento das mensagens nas duas categorias, `HAM` e `SPAM`. O histograma abaixo revela que mensagens de SPAM são significativamente mais longas, provavelmente devido à inclusão de detalhes promocionais, links e instruções.
+O histograma compara a distribuição do número de caracteres em mensagens **HAM** (não SPAM) e **SPAM**. O eixo horizontal representa o comprimento das mensagens (em caracteres), e o eixo vertical mostra a frequência de mensagens em cada faixa.
 
 ![Histograma](./figures/histograma.png)
 
-### Nuvem de Palavras
+**Interpretação**
+
+- Mensagens **SPAM** (laranja) concentram-se em comprimentos maiores (pico em ~150-200 caracteres), refletindo conteúdo promocional detalhado, links ou instruções.
+- Mensagens **HAM** (azul) são mais curtas (pico em ~20-50 caracteres), típicas de conversas cotidianas.
+- A média de palavras por mensagem confirma: **SPAM** tem quase o dobro de palavras (~27 vs. ~14).
+  
+    | Classe | Nº de Amostras | Palavras por Mensagem (Média) |
+    | ------ | -------------- | ----------------------------- |
+    | ham    | 4825           | ~14                           |
+    | spam   | 747            | ~27                           |
+
+
+**Insight**
+
+- O comprimento da mensagem é um forte indicador de SPAM, útil para *feature engineering* (ex.: adicionar "número de caracteres" como entrada do modelo). No entanto, não utilizaremos esta infromação como entrada do modelo, queremos que ele compreenda tal fato por si só no treinamento do MLP.
+
+### 1.2. Nuvem de Palavras
 
 Para visualizar as palavras mais frequentes em cada categoria, geramos duas nuvens de palavras.
 
-#### Nuvem de Palavras - HAM
+#### 1.2.1 Nuvem de Palavras - HAM
 
 As mensagens legítimas (`HAM`) são dominadas por palavras comuns do dia a dia, como "eu", "você", "agora", "bem", "casa" e "amor".
 
 ![HAM](./figures/nuvem_palavras_ham.png)
 
-#### Nuvem de Palavras - SPAM
+#### 1.2.2. Nuvem de Palavras - SPAM
 
 Em contraste, a nuvem de SPAM destaca termos de urgência e apelo comercial, como "grátis", "prêmio", "ligue", "agora", "ganhou" e "urgente". Essa diferença lexical será a base para o modelo aprender a distinguir entre as categorias.
 
 ![SPAM](./figures/nuvem_palavras_spam.png)
 
-### Top 25 Palavras Mais Comuns
+### 1.3. Top 25 Palavras Mais Comuns
 
 O gráfico de barras a seguir exibe as 25 palavras mais frequentes no conjunto de dados (com *stopwords* e símbolos removidos). A alta frequência de pronomes e artigos é esperada em qualquer corpus de texto.
 
 ![Top 25 Palavras](./figures/top_25_palavras.png)
 
-## Resultado da Análise
+**Interpretação**
+- **Termos comuns a ambas classes**: Pronomes ("eu", "você") e verbos ("é", "ter") aparecem com alta frequência, mas pouco discriminam.
+- **Termos exclusivos de SPAM**: "grátis", "prêmio", "ganhou", "ligue" (destacados em vermelho no gráfico) são fortes indicadores de SPAM.
+- **Contexto**: A presença de números (ex.: "1000") também é mais comum em SPAM.
 
-### Total de Mensagens
+**Insight**
+- Essas palavras-chave podem ser usadas para criar regras simples de filtro ou ponderar tokens durante o embedding.
+
+## 2. Resultado da Análise
+
+### 2.1. Total de Mensagens
 
 A tabela abaixo apresenta a distribuição de mensagens entre as categorias `ham` e `spam`:
 
@@ -53,7 +77,7 @@ A tabela abaixo apresenta a distribuição de mensagens entre as categorias `ham
 | spam      | 747               | 27.55                        |
 | **Total** | **5572**          | **16.38**                    |
 
-### Desbalanceamento nas Classes
+### 2.2. Desbalanceamento nas Classes
 
 Observe que há um claro desbalanceamento nas classes:
 
@@ -82,7 +106,7 @@ Para corrigir esse desbalanceamento, as seguintes estratégias serão aplicadas:
 
 4. Considerar a geração de novos dados a partir de correções gramaticais e traduções.
 
-### Arquitetura do Modelo
+## 3. Arquitetura do Modelo
 
 O modelo foi construído com as seguintes camadas:
 
@@ -102,7 +126,7 @@ O modelo foi construído com as seguintes camadas:
 | dense_4 (Dense)                       | (None, 64)                                   | 8,256                      |
 | dense_5 (Dense)                       | (None, 1)                                    | 65                         |
 
-#### Variáveis de Entrada
+### 3.1. Variáveis de Entrada
 
 Cada observação contém os seguintes atributos:
 
@@ -110,12 +134,12 @@ Cada observação contém os seguintes atributos:
 2. `EmailText`: Texto original da mensagem (não usado).
 3. `EmailTextBR`: Texto traduzido da mensagem para o português.
 
-#### Variáveis de Classificação
+### 3.2. Variáveis de Classificação
 
 1. `0`: HAM
 2. `1`: SPAM
 
-#### Funções de Ativação e Otimização
+### 3.3. Funções de Ativação e Otimização
 
 1. **ReLU (Rectified Linear Unit)**: Usada nas camadas ocultas, ajuda a mitigar o problema do desaparecimento do gradiente.
     
@@ -131,7 +155,7 @@ Cada observação contém os seguintes atributos:
 
 4. **Otimizador**: Utilizamos o otimizador **Adam**, popular e eficiente para deep learning.
 
-### Separação dos Dados
+### 3.4. Separação dos Dados
 
 Os dados foram divididos da seguinte forma:
 
@@ -139,15 +163,13 @@ Os dados foram divididos da seguinte forma:
 * `15%` para validação (balanceado entre `HAM` e `SPAM`)
 * `15%` para teste (balanceado entre `HAM` e `SPAM`)
 
-## Treinamento e Avaliação
+## 4. Treinamento e Avaliação
 
 O modelo foi treinado por 20 épocas, com `EarlyStopping=3`, para evitar overfitting. O treinamento parou antes do término das 20 épocas devido à estabilização dos resultados.
 
-## Resumo do Treinamento do Modelo MLP
+### 4.1. Resumo do Treinamento do Modelo MLP
 
 O treinamento foi realizado com o modelo de rede neural MLP (Multilayer Perceptron) com o objetivo de detectar mensagens de SPAM em SMS. O modelo foi treinado por 12 das 20 épocas planejadas, otimizando tempo e recursos computacionais. Abaixo estão as métricas de desempenho para cada época.
-
-### Métricas por Época
 
 | Época | Acurácia | AUC    | Perda   | Precisão | Recall  | Acurácia Val. | AUC Val. | Perda Val. | Precisão Val. | Recall Val. |
 |-------|----------|--------|---------|----------|---------|---------------|----------|------------|----------------|-------------|
@@ -164,9 +186,15 @@ O treinamento foi realizado com o modelo de rede neural MLP (Multilayer Perceptr
 | 11    | 0.9734   | 0.9895 | 0.1088  | 0.8637   | 0.9516  | 0.9713        | 0.9726   | 0.0961     | 0.9889         | 0.7946      |
 | 12    | 0.9794   | 0.9873 | 0.1228  | 0.9080   | 0.9466  | 0.9211        | 0.9846   | 0.2097     | 0.6369         | 0.9554      |
 
-**Modelo salvo em:** `model/spam.keras`
+**Interpretação**
+- **AUC**: Subiu de **0.72** (época 1) para **0.99** (época 12), indicando melhoria na distinção entre classes.
+- **Recall (SPAM)**: Aumentou de **0.22** para **0.95**, mostrando que o modelo aprendeu a capturar SPAMs.
+- **Early Stopping**: Treinamento interrompido na época 12 (de 20), sugerindo convergência rápida.
 
-### Métricas Finais
+**Insight**
+- A perda de validação diminuiu consistentemente, sem sinais de *overfitting* (diferença < 0.01 entre treino/validação na última época).
+
+### 4.2. Métricas Finais
 
 Abaixo estão as métricas finais do modelo, avaliadas no conjunto de teste:
 
@@ -178,22 +206,61 @@ Abaixo estão as métricas finais do modelo, avaliadas no conjunto de teste:
 | Precisão de Teste| 0.9604               |
 | Recall de Teste  | 0.8661               |
 
-### Curvas de Aprendizagem
+**Insight**
+- **Eficiência:** O modelo atinge **acurácia 97.7%** e **AUC 0.987**, demonstrando performance excepcional para um problema desbalanceado. A baixa perda (0.0731) confirma robustez.
+  
+- **Balanceamento Precisão-Recall:** O modelo tem **alta precisão (96%)**, ou seeja, quase todos os alertas de SPAM são corretos (minimiza transtornos aos usuários) e **recall moderado (86.6%)**, ou seja, alguns SPAMs passam, mas é um trade-off aceitável para evitar bloqueios de HAMs.
+  
+- **Recomendações para Otimização**
+  
+    - **Aumentar Recall**: Reduzir o threshold de 0.5 para 0.4 elevaria o recall (~92%), útil se falsos negativos forem críticos.  
+    - **Monitorar Falsos Positivos**: Manter FPR abaixo de 5% é essencial para experiência do usuário.  
+    - **Matriz de Custo**: Atribuir pesos diferentes a FP/FN (ex.: custo de bloquear HAM = 3x o custo de deixar SPAM passar).
 
-#### Durante o Treinamento
+### 4.3. Curvas de Aprendizagem
+
+#### 4.3.1. Durante o Treinamento
 
 Os gráficos de acurácia e perda (loss) durante o treinamento indicam que o modelo convergiu de maneira estável, sem sinais de *overfitting*. A proximidade entre as curvas de treinamento e validação sugere que o modelo generalizou bem os dados.
 
 ![Curvas de Treinamento](./figures/treinamento.png)
 
-#### Curva ROC e Precisão-Recall no Conjunto de Teste
+#### 4.3.2. Curva ROC e Precisão-Recall no Conjunto de Teste
 
 ![Curva ROC](./figures/curva_roc.png)
+
+* TPR (True Positive Rate) / Recall / Sensibilidade  
+    - **Fórmula**: $TPR = \frac{TP}{TP + FN}$
+    - **Significado**: Porcentagem de mensagens **SPAM** corretamente identificadas.  
+    - **Exemplo:** Se há 100 SPAMs e o modelo detecta 87, $TPR = 87%$.  
+
+* FPR (False Positive Rate)
+    - **Fórmula**: $FPR = \frac{FP}{FP + TN}$
+    - **Significado**: Porcentagem de mensagens **HAM** erroneamente classificadas como SPAM.  
+    - **Exemplo:** Se há 100 HAMs e o modelo alerta 4 como SPAM, $FPR = 4%$.  
+
+* Threshold (~0.5)
+    - **Definição**: Valor de corte para decidir se uma mensagem é SPAM (ex: probabilidade ≥ 0.5 → SPAM).  
+    - **Trade-off**:  
+      - **Threshold baixo (ex: 0.3)**: Aumenta **TPR** (captura mais SPAMs), mas eleva **FPR** (mais HAMs incorretamente bloqueados).  
+      - **Threshold alto (ex: 0.7)**: Reduz **FPR** (menos falsos alarmes), mas diminui **TPR** (SPAMs passam despercebidos).  
+    - **Ponto Ótimo (0.5)**: Equilíbrio entre capturar SPAMs (**TPR alto**) e minimizar irritação do usuário (**FPR baixo**).  
+
+* Exemplo Prático
+    - Se o threshold for ajustado para **0.4**: TPR sobe para 92% (mais SPAMs detectados), mas FPR aumenta para 8% (8 em 100 HAMs são bloqueados erroneamente).  
+    - Se for ajustado para **0.6**: TPR cai para 82% (alguns SPAMs escapam), mas FPR cai para 2% (apenas 2 HAMs são filtrados).
+
 ![Curva Precisão-Recall](./figures/curva_precisao_recal.png)
 
-### Matriz de Confusão
+- **Precisão alta (>90%)** mesmo com recall ~80-90%, indicando robustez no desbalanceamento.
+- **Área sob a curva (AP)**: 0.98, confirmando desempenho consistente.
 
-A matriz de confusão para o conjunto de teste foi usada para avaliar a performance do modelo, destacando o número de classificações corretas e incorretas:
+**Insight**
+- A curva ROC é mais otimista devido ao desbalanceamento; a curva Precisão-Recall é mais informativa para SPAM (classe minoritária).
+
+### 4.4. Matriz de Confusão
+
+A matriz de confusão para o conjunto de teste (836 mensagens) foi usada para avaliar a performance do modelo, destacando o número de classificações corretas e incorretas:
 
 ![Matriz de Confusão](./figures/matriz_confusao.png)
 
@@ -204,7 +271,22 @@ A matriz de confusão para o conjunto de teste foi usada para avaliar a performa
 - **015** Falsos Negativos (SPAM incorretamente classificado como HAM)
 - **097** Verdadeiros Positivos (SPAM corretamente identificado)
 
-### Métricas de Performance
+**Dados**  
+|                | **Predito HAM** | **Predito SPAM** |  
+|----------------|------------------|------------------|  
+| **Real HAM**   | 720 (TN)         | 4 (FP)           |  
+| **Real SPAM**  | 15 (FN)          | 97 (TP)          |  
+
+**Interpretação**
+- **Precisão (SPAM)**: 96% (97/(97+4)) – quase nenhum falso positivo.
+- **Recall (SPAM)**: 87% (97/(97+15)) – 13% dos SPAMs passaram despercebidos.
+- **Falsos Negativos**: 15 SPAMs classificados como HAM e 4 HAMs classificados como SPAM.
+  
+**Insight**
+- Ajustar o *threshold* de classificação para reduzir falso negativos (ex.: aumentar *recall*, mesmo que diminua a precisão).
+- Baixo risco de o usuário perder uma mensagem real. No entanto, é preciso reduzir o número de SPAMs classifcados como HAM para evitar que algum usuário clique em link malicioso.
+
+### 4.5. Métricas de Performance
 
 As métricas de desempenho detalhadas no conjunto de teste:
 
@@ -218,7 +300,7 @@ As métricas de desempenho detalhadas no conjunto de teste:
 
 A elevada acurácia e o bom F1-Score demonstram que o modelo é eficaz na distinção entre mensagens SPAM e HAM.
 
-## Teste com Dados Reais
+## 5. Teste com Dados Reais
 
 Para validar a capacidade de generalização do modelo, realizamos testes com novas mensagens que o modelo nunca viu antes. Abaixo estão os resultados, mostrando a classificação correta em todos os casos:
 
@@ -231,9 +313,15 @@ Para validar a capacidade de generalização do modelo, realizamos testes com no
 * **HAM**: "Eu amo programar, é muito divertido!"
 * **SPAM**: "Sua conta foi comprometida, ligue para 555-1234 para redefinir sua senha imediatamente!"
 
-O modelo classificou todas as mensagens corretamente, atribuindo probabilidades muito altas à classe apropriada, demonstrando confiança e eficácia em situações do mundo real.
+**Padrões Identificados**
+- **SPAMs**: Contêm palavras como "ganhe", "prêmio", "desconto", "urgente" e números monetários.
+- **HAMs**: Linguagem coloquial, sem apelos comerciais.
 
-## Conclusão
+**Insight**
+- Mensagens ambíguas (ex.: "Você ganhou um abraço!") podem ser falsos positivos, o que requer uma lista de exceções.
+- O modelo classificou todas as mensagens corretamente, atribuindo probabilidades muito altas à classe apropriada, demonstrando confiança e eficácia em situações do mundo real.
+
+## 6. Conclusão
 
 Este projeto demonstrou com sucesso a aplicação de um modelo de **Multilayer Perceptron (MLP)** para a detecção de **SPAM** em mensagens SMS em português. A partir de um dataset originalmente em inglês, realizamos a tradução e completamos um ciclo completo de análise, treinamento e validação.
 
@@ -241,7 +329,7 @@ A análise exploratória foi fundamental para identificar padrões específicos,
 
 Os resultados confirmam que, mesmo com uma arquitetura de rede neural relativamente simples, é possível criar um detector de **SPAM** altamente eficaz. Isso ressalta a importância da qualidade dos dados e do pré-processamento adequado para garantir a performance do modelo.
 
-## Ferramentas e Tecnologias
+## 7. Ferramentas e Tecnologias
 
 Este projeto foi desenvolvido utilizando as seguintes ferramentas e bibliotecas:
 
