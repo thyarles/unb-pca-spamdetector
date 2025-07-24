@@ -304,14 +304,42 @@ A elevada acurácia e o bom F1-Score demonstram que o modelo é eficaz na distin
 
 Para validar a capacidade de generalização do modelo, realizamos testes com novas mensagens que o modelo nunca viu antes. Abaixo estão os resultados, mostrando a classificação correta em todos os casos:
 
-* **SPAM**: "Ganhe um prêmio de R$10.000! Clique aqui para reivindicar agora!"
-* **SPAM**: "Oferta exclusiva: 50% de desconto em todos os produtos. Não perca!"
-* **HAM**: "Oi, mãe! Chego para o jantar às 19h."
-* **HAM**: "Reunião de equipe amanhã às 10h. Por favor, confirme sua presença."
-* **SPAM**: "Seu iPhone 15 foi selecionado! Responda a esta pesquisa para recebê-lo grátis agora!"
-* **SPAM**: "Você ganhou 1000 reais. Clique nesse link para receber."
-* **HAM**: "Eu amo programar, é muito divertido!"
-* **SPAM**: "Sua conta foi comprometida, ligue para 555-1234 para redefinir sua senha imediatamente!"
+    1/1 ━━━━━━━━━━━━━━━━━━━━ 0s 24ms/step
+    SPAM: Parabéns! Você ganhou um prêmio! Ligue 1234-9990 agora para reivindicar.
+    Probabilidades: [SPAM = 0.7678% | HAM = 0.2322%]
+    --------------------------------------------------
+    1/1 ━━━━━━━━━━━━━━━━━━━━ 0s 22ms/step
+    HAM: Não se esqueça da reunião às 10h amanhã.
+    Probabilidades: [SPAM = 0.0196% | HAM = 0.9804%]
+    --------------------------------------------------
+    1/1 ━━━━━━━━━━━━━━━━━━━━ 0s 20ms/step
+    SPAM: Você ganhou 500 reais! Ligue agora para 08007888 e resgate seu prêmio.
+    Probabilidades: [SPAM = 0.9671% | HAM = 0.0329%]
+    --------------------------------------------------
+    1/1 ━━━━━━━━━━━━━━━━━━━━ 0s 19ms/step
+    HAM: Oferta por tempo limitado! Pegue seu presente grátis agora!
+    Probabilidades: [SPAM = 0.3590% | HAM = 0.6410%]
+    --------------------------------------------------
+    1/1 ━━━━━━━━━━━━━━━━━━━━ 0s 20ms/step
+    SPAM: Você ganhou 1000 reais. Clique nesse link https://clique.agora para receber.
+    Probabilidades: [SPAM = 0.7162% | HAM = 0.2838%]
+    --------------------------------------------------
+    1/1 ━━━━━━━━━━━━━━━━━━━━ 0s 20ms/step
+    SPAM: Sua conta foi comprometida, ligue 555-1234 para redefinir sua senha imediatamente.
+    Probabilidades: [SPAM = 0.5472% | HAM = 0.4528%]
+    --------------------------------------------------
+    1/1 ━━━━━━━━━━━━━━━━━━━━ 0s 20ms/step
+    HAM: Enquanto os colegas ganharam SS com o meu trabalho, eu estou fazendo o deles.
+    Probabilidades: [SPAM = 0.0016% | HAM = 0.9984%]
+    --------------------------------------------------
+    1/1 ━━━━━━━━━━━━━━━━━━━━ 0s 20ms/step
+    HAM: Transfere R$ 500 hoje para mim.
+    Probabilidades: [SPAM = 0.1201% | HAM = 0.8799%]
+    --------------------------------------------------
+    1/1 ━━━━━━━━━━━━━━━━━━━━ 0s 20ms/step
+    HAM: O chefe mandou você enviar o artigo para https://artigo.com
+    Probabilidades: [SPAM = 0.2519% | HAM = 0.7481%]
+    --------------------------------------------------
 
 **Padrões Identificados**
 - **SPAMs**: Contêm palavras como "ganhe", "prêmio", "desconto", "urgente" e números monetários.
